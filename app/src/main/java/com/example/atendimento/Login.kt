@@ -10,8 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.microplus.wsGestplus.models.LoginData
 import com.microplus.wsGestplus.apis.LoginApi
+import com.microplus.wsGestplus.models.LoginData
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
