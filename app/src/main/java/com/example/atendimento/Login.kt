@@ -1,6 +1,11 @@
 package com.example.atendimento
 
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+
 import android.os.Bundle
+import android.os.StrictMode
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -12,6 +17,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.microplus.wsGestplus.apis.LoginApi
 import com.microplus.wsGestplus.models.LoginData
+import android.util.Log
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +27,7 @@ class LoginActivity : ComponentActivity() {
         }
     }
 }
+
 
 @Composable
 fun LoginScreen() {
@@ -61,12 +68,25 @@ fun LoginScreen() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            performLogin(email, password, idCompany, contribuinte, { msg -> successMessage = msg }, { msg -> errorMessage = msg })
+            Log.d("LoginScreen", "Tentando fazer login com email: $email")
+            performLogin(email, password, idCompany, contribuinte,
+                { msg ->
+                    successMessage = msg
+                    Log.d("LoginScreen", "Login bem-sucedido: $msg")
+                },
+                { msg ->
+                    errorMessage = msg
+                    Log.e("LoginScreen", "Erro ao fazer login: $msg")
+                }
+            )
         }) {
             Text("Entrar")
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = { recoverPassword(email) }) {
+        Button(onClick = {
+            Log.d("LoginScreen", "Recuperação de senha acionada para email: $email")
+            recoverPassword(email)
+        }) {
             Text("Esqueceu a Senha?")
         }
         if (errorMessage.isNotEmpty()) {
@@ -98,27 +118,30 @@ fun performLogin(
         licenseKey = "",
         userPosto = ""
     )
+    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
     val objws = LoginApi("https://core.login.gestplus.pt/")
-    val response = objws.getLogin(logObj)
+    try {
+        val response = objws.getLogin(logObj)
 
-    if (response.status != "") {
-        onError("Erro ao fazer login. Verifique suas credenciais.")
-    } else {
-        onSuccess("Login realizado com sucesso.")
+        Log.d("performLogin", "Enviando dados de login: $logObj")
+
+        if (response.status!!.isNotEmpty()) {
+            onError("Erro ao fazer login. Verifique suas credenciais.")
+        } else {
+            onSuccess("Login realizado com sucesso.")
+        }
+    } catch (e: Exception) {
+        Log.e("performLogin", "Erro de rede: ${e.message}")
+        onError("Erro de rede. Tente novamente.")
     }
 }
 
 fun recoverPassword(email: String) {
     if (email.isEmpty()) {
-        // Handle empty email case
+        Log.e("recoverPassword", "Email está vazio.")
         return
     }
-    // Placeholder for actual password recovery logic
-    // Example:
-    // val response = api.sendRecoveryEmail(email)
-    // if (response.isSuccessful) {
-    //     // Handle success
-    // } else {
-    //     // Handle error
-    // }
+    Log.d("recoverPassword", "Enviando solicitação de recuperação de senha para: $email")
+    // Placeholder para a lógica real de recuperação de senha
 }
