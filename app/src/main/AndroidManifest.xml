@@ -3,9 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.atendimento">
 
-    <!-- Permissões necessárias para acesso à internet -->
+    <!-- Permissões necessárias para acessar logs de chamadas, contatos, estado do telefone e internet -->
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Adicionando permissão para ouvir eventos de chamadas -->
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
 
     <application
         android:allowBackup="true"
@@ -17,16 +26,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Atendimento"
         tools:targetApi="31">
+
+        <!-- Atividade principal que é lançada quando o aplicativo inicia -->
         <activity
             android:name=".LoginActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Atendimento">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Recebedor configurado para escutar eventos de estado do telefone -->
+        <receiver android:name=".CallReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

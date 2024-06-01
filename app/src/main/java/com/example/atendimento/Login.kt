@@ -73,6 +73,7 @@ fun LoginScreen() {
                 { msg ->
                     successMessage = msg
                     Log.d("LoginScreen", "Login bem-sucedido: $msg")
+
                 },
                 { msg ->
                     errorMessage = msg
