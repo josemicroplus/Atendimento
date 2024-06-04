@@ -5,8 +5,7 @@
 
     <!-- Permissões necessárias para acessar logs de chamadas, contatos, estado do telefone e internet -->
     <uses-feature
-        android:name="android.hardware.telephony"
-        android:required="false" />
+        android:name="android.hardware.telephony" />
 
     <uses-permission android:name="android.permission.READ_CALL_LOG"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
@@ -30,6 +29,15 @@
         <!-- Atividade principal que é lançada quando o aplicativo inicia -->
         <activity
             android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".CallInfoActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

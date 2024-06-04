@@ -1,5 +1,6 @@
 package com.example.atendimento
 
+import android.content.IntentFilter
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -22,9 +23,16 @@ import android.util.Log
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        iniciarBroadcastReceiver()
         setContent {
             LoginScreen()
         }
+    }
+
+    private fun iniciarBroadcastReceiver() {
+        val filtro = IntentFilter()
+        filtro.addAction("android.intent.action.PHONE_STATE")
+        registerReceiver(CallReceiver(), filtro)
     }
 }
 
@@ -73,6 +81,9 @@ fun LoginScreen() {
                 { msg ->
                     successMessage = msg
                     Log.d("LoginScreen", "Login bem-sucedido: $msg")
+
+
+                  //  CallReceiver
 
                 },
                 { msg ->

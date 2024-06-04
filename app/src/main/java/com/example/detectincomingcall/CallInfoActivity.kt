@@ -9,39 +9,42 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.atendimento.MainActivity
 import com.microplus.wsGestplus.apis.GetContactsApi
-import com.microplus.wsGestplus.apis.GetPhoneNumbersApi
 import com.microplus.wsGestplus.models.Contact
 import com.microplus.wsGestplus.models.ParamGetContacts
-import com.microplus.wsGestplus.models.ParamGetPhoneNumbers
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class CallInfoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val incomingNumber = intent.getStringExtra("INCOMING_NUMBER")
         setContent {
-            CallInfoScreen()
+            CallInfoScreen(incomingNumber)
         }
     }
 }
 
 @Composable
-fun CallInfoScreen() {
-    val intent = Intent(LocalContext.current,MainActivity::class.java)
-    val incomingNumber =  intent.getStringExtra("INCOMING_NUMBER")
+fun CallInfoScreen(incomingNumber: String?) {
     var contactName by remember { mutableStateOf("") }
     var contactCompany by remember { mutableStateOf("") }
     var contactNIF by remember { mutableStateOf("") }
 
     LaunchedEffect(incomingNumber) {
-        // Fetch contact info using API
-        val contactInfo = fetchContactInfo(incomingNumber.toString())
-        contactName = contactInfo.givenName.toString()
-        contactCompany = contactInfo.displayName.toString()
-        contactNIF = contactInfo.familyName.toString()
+        if (incomingNumber != null) {
+            val contactInfo = fetchContactInfo(incomingNumber)
+            if(contactInfo==null){
+                contactName=""
+                contactCompany=""
+                contactNIF=""
+            }else{
+                contactName = contactInfo!!.givenName.toString()
+                contactCompany = contactInfo!!.displayName.toString()
+                contactNIF = contactInfo!!.familyName.toString()
+            }
+        }
     }
 
     Column(
@@ -64,12 +67,13 @@ fun CallInfoScreen() {
     }
 }
 
-suspend fun fetchContactInfo(phoneNumber: String): Contact {
-    // Implementar a lógica para buscar as informações de contato usando a API com.microplus.wsGestplus
+suspend fun fetchContactInfo(phoneNumber: String): Contact? {
     val contactApi = GetContactsApi("https://core.api.gestplus.pt/")
-
-    var obhPara:ParamGetContacts= ParamGetContacts(
-        phoneNumber=phoneNumber
-    )
-    return contactApi.getContacts( obhPara ).objContactos!![0]
+    val paramGetContacts = ParamGetContacts(phoneNumber = phoneNumber)
+    var objRet=contactApi.getContacts(paramGetContacts).objContactos;
+    if(objRet!!.count()==0){
+        return null;
+    }else{
+        return objRet[0];
+    }
 }
