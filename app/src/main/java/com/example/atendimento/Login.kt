@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.microplus.wsGestplus.apis.LoginApi
 import com.microplus.wsGestplus.models.LoginData
 import android.util.Log
+import com.microplus.wsGestplus.infrastructure.ApiClient
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,6 +143,8 @@ fun performLogin(
             onError("Erro ao fazer login. Verifique suas credenciais.")
         } else {
             onSuccess("Login realizado com sucesso.")
+            ApiClient.defaultHeaders += mapOf("Authorization" to "Bearer " + response.token)
+
         }
     } catch (e: Exception) {
         Log.e("performLogin", "Erro de rede: ${e.message}")
